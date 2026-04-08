@@ -1,0 +1,70 @@
+# ── Data files (too large / WRDS licensing prohibits redistribution) ──────────
+*.parquet
+*.csv.gz
+*.gz
+*.zip
+
+# Specific large CSVs that cannot be shared
+data/
+taq/
+synchronized/
+audio_features/
+finbert/
+tables_v2/
+audio/
+transcripts/
+
+# Allow small metadata CSVs that ARE safe to share (opt-in below)
+!selected_sample_40_FINAL.csv
+!european_adr_sample.csv
+!call_times_extracted.csv
+!call_times_eu_extracted.csv
+
+# ── Audio files (Refinitiv licensing) ─────────────────────────────────────────
+*.mp3
+*.wav
+*.flac
+
+# ── Log and scratch files ──────────────────────────────────────────────────────
+*.log
+nohup.out
+robustness_output.txt
+*.out
+*.err
+
+# ── Backup and temp files ─────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.swp
+*~
+0                      # the empty scratch file
+
+# ── Python cache ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.eggs/
+*.egg-info/
+dist/
+build/
+
+# ── Jupyter / IPython ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Environment ───────────────────────────────────────────────────────────────
+.env
+.venv/
+venv/
+thesis_env_scratch/
+*.cfg         # conda env exports — use requirements.txt instead
+
+# ── OS cruft ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── SLURM ─────────────────────────────────────────────────────────────────────
+# Keep .sh scripts but exclude job output files
+slurm-*.out
+slurm-*.err
