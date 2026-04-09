@@ -1,12 +1,20 @@
-
 #!/usr/bin/env python3
-
 """
+28_run_finbert.py
+Score analyst tone in earnings call Q&A sections using ProsusAI/finbert.
 
-28_run_finbert.py / 37_run_finbert_2023.py
+Extracts analyst speaking turns only (excludes management and operator).
+analyst_tone = sum_s w_s * (P(pos)_s - P(neg)_s), weighted by word count.
+FinBERT label order: [positive=0, negative=1, neutral=2].
 
-Analyst tone via ProsusAI/finbert. Q&A analyst turns only.
+Input:  data/transcripts/processed/*.txt
+Output: data/finbert/finbert_tone_results_all.csv
 
+# NOTE: Portions of this script were debugged with assistance
+# from Claude AI (Anthropic). Core statistical design and all
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis 
+# Advisor: Daniel Rigobon
 """
 
 import pandas as pd, numpy as np, re, os
