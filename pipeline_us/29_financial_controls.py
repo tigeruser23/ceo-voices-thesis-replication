@@ -16,9 +16,6 @@ within 120 days before the call date.
 Output: data/financial_controls_all.csv
   Columns: ticker, quarter, roa, mve, bm, leverage, surp, n_analysts
 
-NOTE: BHAR (30/60/90-day buy-and-hold abnormal returns) is computed
-by a separate script and is not part of the main regression pipeline.
-
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
 # empirical choices are my own.
@@ -38,7 +35,6 @@ warnings.filterwarnings("ignore")
 base     = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 out_path = base / "financial_controls_all.csv"
 
-# ── Load sample and call times (not analysis_dataset.csv — that comes later) ──
 sample     = pd.read_csv(base / "selected_sample_40_FINAL.csv")
 call_times = pd.read_csv(base / "call_times_extracted.csv")
 
@@ -51,13 +47,11 @@ ticker_str = "'" + "','".join(tickers) + "'"
 
 print(f"Sample: {len(calls)} firm-quarters across {len(tickers)} firms")
 
-# ── Connect to WRDS (no hardcoded username) ────────────────────────────────────
 print("Connecting to WRDS...")
 db = wrds.Connection()
 print("Connected.")
 
-# ── Section 1: Compustat quarterly fundamentals ───────────────────────────────
-print("\nQuerying Compustat...")
+# 1: Compustat Quarterly Fundamentals
 comp = db.raw_sql(f"""
     SELECT
         tic        AS ticker,
@@ -93,8 +87,7 @@ comp["leverage"] = comp["ltq"]  / comp["atq"]
 comp_clean = comp[["ticker", "datadate", "roa", "mve",
                    "bm", "leverage"]].copy()
 
-# ── Section 2: I/B/E/S earnings surprise ─────────────────────────────────────
-print("\nQuerying I/B/E/S...")
+# 2: I/B/E/S earnings surprise 
 ibes = db.raw_sql(f"""
     SELECT
         a.ticker,
@@ -127,7 +120,7 @@ ibes = (ibes.sort_values("announce_date")
 
 db.close()
 
-# ── Section 3: Match to firm-quarters ─────────────────────────────────────────
+# 3: Match to firm-quarters 
 print("\nMatching controls to firm-quarters...")
 results = []
 
@@ -178,7 +171,6 @@ for _, row in calls.iterrows():
 
 ctrl_df = pd.DataFrame(results)
 
-# ── Summary and save ──────────────────────────────────────────────────────────
 print(f"\nMatched {ctrl_df['roa'].notna().sum()} / {len(ctrl_df)} "
       f"Compustat observations")
 print(f"Matched {ctrl_df['surp'].notna().sum()} / {len(ctrl_df)} "
