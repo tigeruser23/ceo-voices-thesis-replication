@@ -1,36 +1,43 @@
-# Replication requirements
+# Replication requirements for:
+# "Do CEO Voices Move Markets? Vocal Stress and Analyst Tone in
+#  Earnings Calls as Predictors of High-Frequency Order Flow"
+# Olivia Yang — Princeton Senior Thesis
+#
 # Tested on Python 3.11 (Princeton Adroit HPC cluster).
 # Install with: pip install -r requirements.txt
-
+#
 # NOTE: wrds and opensmile may require additional system-level setup.
 # See WRDS: https://wrds-www.wharton.upenn.edu/pages/support/getting-started/3-using-python-wrds/
 # See OpenSMILE: https://audeering.github.io/opensmile-python/
 
-# ── Core data / numerics ──────────────────────────────────────────────────────
+#  Core data / numerics 
 numpy>=1.24,<2.0
 pandas>=2.0,<3.0
-pyarrow>=14.0          # parquet read/write
+pyarrow>=14.0      
 
-# ── WRDS database access ──────────────────────────────────────────────────────
+#  WRDS database access 
 wrds>=3.1.6
 
-# ── Machine learning / stats ──────────────────────────────────────────────────
+#  Machine learning / stats 
 scikit-learn>=1.3,<2.0
 statsmodels>=0.14,<1.0
 scipy>=1.11,<2.0
 
-# ── NLP / FinBERT ─────────────────────────────────────────────────────────────
+#  NLP / FinBERT 
 transformers>=4.35,<5.0
-torch>=2.0              # CPU-only install fine; GPU optional
+torch>=2.0             
 # For CPU-only torch on Linux:
 # pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-# ── Acoustic feature extraction ───────────────────────────────────────────────
+#  Acoustic feature extraction 
 opensmile>=2.4.1
 # Requires OpenSMILE binary installed separately.
 # On Adroit: module load opensmile (or conda install -c conda-forge opensmile)
 
-# ── Utilities ─────────────────────────────────────────────────────────────────
+#  Visualisation 
+matplotlib>=3.7,<4.0    # figures/make_figures.py and figures/fig3_1_pipeline.py
+
+#  Utilities 
 pytz>=2023.3            # timezone conversion in 14_extract_call_times.py
 pathlib2>=2.3           # backport safety; stdlib pathlib sufficient on 3.11
-tqdm>=4.65              # optional progress bars
+tqdm>=4.65            
