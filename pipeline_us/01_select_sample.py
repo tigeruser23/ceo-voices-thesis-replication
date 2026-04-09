@@ -12,7 +12,7 @@ Output: data/selected_sample_40_FINAL.csv
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
 # empirical choices are my own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis
+# Author: Olivia Yang, Princeton Senior Thesis
 # Advisor: Daniel Rigobon
 """
 
@@ -26,7 +26,6 @@ RANDOM_SEED    = 42
 N_QUINTILES    = 5
 N_PER_QUINTILE = 8
 
-# FIX: use full scratch path, not relative 'data/' (would fail on Adroit)
 data_dir = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 data_dir.mkdir(parents=True, exist_ok=True)
 
