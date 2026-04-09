@@ -46,7 +46,7 @@ PRE_END    = pd.Timestamp("1900-01-01 09:30:00")
 EVENT_START = pd.Timestamp("1900-01-01 09:30:00")
 EVENT_END   = pd.Timestamp("1900-01-01 10:30:00")
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+#  Helper funcs
 def load_taq_eu(ticker: str, quarter: str):
     """Load EU TAQ parquet; return (trades_df, quotes_df) or (None, None)."""
     path = taq_dir / f"{ticker}_{quarter}_taq.parquet"
@@ -76,7 +76,6 @@ def sign_trades(trades: pd.DataFrame, quotes: pd.DataFrame) -> pd.DataFrame:
     if trades.empty or quotes.empty:
         return trades.assign(sign=np.nan)
 
-    # Normalise ask column name
     if "ask" in quotes.columns:
         ask_col = "ask"
     elif "ofr" in quotes.columns:
@@ -117,7 +116,7 @@ def order_imbalance(signed_trades: pd.DataFrame):
     return float(valid["sign"].sum() / len(valid)), len(valid)
 
 
-# ── Main loop ─────────────────────────────────────────────────────────────────
+# Main loop 
 quarters = [f"Q{q}_{y}" for y in [2022, 2023] for q in [1, 2, 3, 4]]
 all_results = []
 
@@ -143,7 +142,6 @@ for _, firm in sample.iterrows():
             })
             continue
 
-        # Build date-aware window bounds from actual trade dates
         call_date = trades["timestamp"].dt.date.mode()[0]
         date_str  = str(call_date)
 
@@ -162,7 +160,6 @@ for _, firm in sample.iterrows():
         oi_pre,   n_pre   = order_imbalance(pre_trades)
         oi_event, n_event = order_imbalance(event_trades)
 
-        # Drop if insufficient activity
         if n_event < 10:
             print(f"  DROP {ticker} {quarter}: only {n_event} event-window trades")
             all_results.append({
@@ -197,7 +194,7 @@ for _, firm in sample.iterrows():
               f"oi_shift={oi_shift:.4f}" if oi_shift is not None
               else f"  OK  {ticker} {quarter}  oi_shift=NaN")
 
-# ── Save ───────────────────────────────────────────────────────────────────────
+#  Save 
 sync_df = pd.DataFrame(all_results)
 sync_df.to_csv(out_dir / "eu_adr_synchronized.csv", index=False)
 
