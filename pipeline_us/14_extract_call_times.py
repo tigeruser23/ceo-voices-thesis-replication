@@ -138,7 +138,6 @@ df = (pd.DataFrame(call_times)
 df.to_csv(output_path, index=False)
 print(f"\nSaved: {output_path}")
 
-# ── Diagnostics ───────────────────────────────────────────────────────────────
 print("\nQuarter distribution:")
 print(df["quarter"].value_counts().sort_index().to_string())
 
