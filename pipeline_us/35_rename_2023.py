@@ -8,7 +8,7 @@ Quarter assigned by calendar convention (not fiscal):
   Q1: Jan–Mar | Q2: Apr–Jun | Q3: Jul–Sep | Q4: Oct–Dec
 
 Corrects previous bug where both Q3 and Q4 2023 calls were
-mapped into Q4_2023 slots due to a fiscal-vs-calendar offset error.
+mapped into Q4_2023 slots due to an offset error.
 Clears any existing 2023 processed files before re-renaming.
 
 Input:  data/audio/raw/*.mp3
