@@ -27,7 +27,7 @@ RANDOM_SEED = 42
 data_dir = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 data_dir.mkdir(parents=True, exist_ok=True)
 
-# ── Seed list: 36 European ADR candidates ─────────────────────────────────────
+#  Seed list: 36 European ADR candidates 
 # NYSE/NASDAQ tickers for European firms with ADR listings.
 # Semi-annual reporters flagged; excluded from final sample post-validation.
 SEED_LIST = [
@@ -86,8 +86,7 @@ seed_df = seed_df[~seed_df["semi_annual"]].reset_index(drop=True)
 tickers  = seed_df["ticker"].tolist()
 ticker_str = "', '".join(tickers)
 
-# ── WRDS CRSP validation ───────────────────────────────────────────────────────
-print("Connecting to WRDS...")
+#  WRDS CRSP validation 
 db = wrds.Connection()
 
 crsp = db.raw_sql(f"""
@@ -127,7 +126,7 @@ latest_tickers = (crsp.sort_values("date")
 
 coverage = coverage.merge(latest_tickers, on="permno")
 
-# ── taqmsec availability check ─────────────────────────────────────────────────
+#  taqmsec availability check 
 # Spot-check Q1 2022 and Q1 2023 for each firm
 taq_results = []
 for _, row in coverage.iterrows():
@@ -165,11 +164,11 @@ taq_df = pd.DataFrame(taq_results)
 coverage = coverage.merge(taq_df, on="permno")
 final = coverage[coverage["taq_ok"]].copy()
 
-# ── Merge metadata from seed list ─────────────────────────────────────────────
+# Merge metadata from seed list 
 final = final.merge(seed_df[["ticker", "company", "country"]],
                     on="ticker", how="left")
 
-# ── Volatility stratification within country ──────────────────────────────────
+#  Volatility stratification within country 
 np.random.seed(RANDOM_SEED)
 crsp_full = crsp[crsp["permno"].isin(final["permno"])].copy()
 crsp_full["date"] = pd.to_datetime(crsp_full["date"])
@@ -192,7 +191,7 @@ final["vol_quintile"] = (final.groupby("country")["hist_vol"]
 final["n_firm_quarters"] = 8
 final["sample_type"]     = "EU_ADR_v2"
 
-# ── Save ───────────────────────────────────────────────────────────────────────
+#  Save 
 out_cols = ["permno", "ticker", "company", "country",
             "exchcd", "hist_vol", "vol_quintile",
             "mean_price", "mean_mktcap_b",
