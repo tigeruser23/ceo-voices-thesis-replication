@@ -16,8 +16,8 @@ Output: tables_v2/summary_statistics.csv
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
-# empirical choices are the author's own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis (2024)
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis 
 # Advisor: Daniel Rigobon
 """
 
@@ -52,7 +52,7 @@ def describe_var(series, label):
 
 rows = []
 
-# ── Panel A: US Sample ────────────────────────────────────────────────────────
+#  Panel A: US Sample 
 panel_a_vars = [
     ("oi_shift",            "OI Shift"),
     ("analyst_tone",        "Analyst Tone (FinBERT)"),
@@ -70,7 +70,6 @@ panel_a_vars = [
 ]
 
 print("Panel A: US Sample")
-print("-" * 70)
 for col, label in panel_a_vars:
     if col in us.columns:
         r = describe_var(us[col], label)
@@ -82,7 +81,7 @@ for col, label in panel_a_vars:
     else:
         print(f"  {label:<35} MISSING COLUMN: {col}")
 
-# ── Panel B: European ADR Sample ──────────────────────────────────────────────
+#  Panel B: European ADR Sample 
 panel_b_vars = [
     ("oi_shift",            "OI Shift (open-reaction window)"),
     ("analyst_tone",        "Analyst Tone (FinBERT)"),
@@ -103,7 +102,7 @@ for col, label in panel_b_vars:
     else:
         print(f"  {label:<35} MISSING COLUMN: {col}")
 
-# ── Panel C: Pooled US + EU ────────────────────────────────────────────────────
+#  Panel C: Pooled US + EU 
 panel_c_vars = [
     ("oi_shift",     "OI Shift"),
     ("analyst_tone", "Analyst Tone"),
@@ -120,14 +119,13 @@ for col, label in panel_c_vars:
               f"Mean={r['mean']:7.3f}  SD={r['sd']:7.3f}  "
               f"Med={r['median']:7.3f}")
 
-# ── Save CSV ───────────────────────────────────────────────────────────────────
+#  Save CSV 
 stats_df = pd.DataFrame(rows)[
     ["panel","variable","n","mean","sd","p25","median","p75"]
 ]
 stats_df.to_csv(tabs / "summary_statistics.csv", index=False)
 print(f"\nSaved: summary_statistics.csv  ({len(stats_df)} rows)")
 
-# ── LaTeX output matching Table 3.4 ───────────────────────────────────────────
 tex = [
     r"\begin{table}[H]",
     r"\centering",
