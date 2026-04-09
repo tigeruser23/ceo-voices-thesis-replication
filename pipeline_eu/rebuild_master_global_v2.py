@@ -19,8 +19,6 @@ Reduced control vector for pooled models:
   lnmve + is_market_hours + log_during_n_trades + is_2023
   (ROA and B/M omitted: unavailable for EU via WRDS)
 
-Clean rewrite (v2): no iterative patches from prior runs.
-
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
 # empirical choices are my own.
@@ -38,17 +36,14 @@ from sklearn.decomposition import PCA
 
 base = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 
-# ── 1. Load US MASTER ─────────────────────────────────────────────────────────
-print("Loading US MASTER...")
+#  1. Load US MASTER 
 us = pd.read_parquet(base / "analysis_dataset_MASTER.parquet")
 us["is_eu"] = 0
 print(f"  US MASTER: {us.shape[0]} rows x {us.shape[1]} cols")
 
-# ── 2. Load EU OI ─────────────────────────────────────────────────────────────
-print("Loading EU OI...")
+#  2. Load EU OI 
 eu_oi = pd.read_csv(base / "synchronized" / "eu_adr_synchronized.csv")
 
-# Rename to match US column convention
 eu_oi = eu_oi.rename(columns={
     "pre_oi":         "pre_30m_order_imbalance",
     "pre_n_trades":   "pre_30m_n_trades",
@@ -61,8 +56,7 @@ EXCLUDE_EU = {"CFR", "RIO"}
 eu_oi = eu_oi[~eu_oi["ticker"].isin(EXCLUDE_EU)].copy()
 print(f"  EU OI rows (post-exclusion): {len(eu_oi)}")
 
-# ── 3. Load EU audio features ─────────────────────────────────────────────────
-print("Loading EU audio features...")
+#  3. Load EU audio features 
 eu_audio_path = base / "audio_features" / "europe" / "eu_audio_features_all.csv"
 eu_audio = pd.read_csv(eu_audio_path)
 eu_audio = eu_audio[~eu_audio["ticker"].isin(EXCLUDE_EU)].copy()
@@ -70,13 +64,10 @@ eu_audio = eu_audio[~eu_audio["ticker"].isin(EXCLUDE_EU)].copy()
 # Identify the 88 eGeMAPS feature columns
 audio_cols = [c for c in eu_audio.columns if c not in ["ticker", "quarter"]]
 
-# Standardise EU audio on combined US+EU means/stds
-# Load US audio to get combined distribution
 us_audio_path = base / "audio_features" / "audio_features_all308.csv"
 us_audio = pd.read_csv(us_audio_path)
 us_audio_feat = [c for c in us_audio.columns if c not in ["ticker", "quarter"]]
 
-# Use only columns present in both
 common_audio = [c for c in audio_cols if c in us_audio_feat]
 print(f"  Common eGeMAPS features: {len(common_audio)}")
 
@@ -90,7 +81,6 @@ eu_audio[common_audio] = scaler.transform(eu_audio[common_audio])
 eu_audio.rename(columns={c: f"audio_{c}" for c in common_audio}, inplace=True)
 audio_cols_renamed = [f"audio_{c}" for c in common_audio]
 
-# Construct EU stress index from standardised features
 def find_col(patterns, cols):
     for p in patterns:
         matches = [c for c in cols if p in c]
@@ -127,8 +117,7 @@ eu_pcs = pca.transform(eu_audio[audio_cols_renamed].fillna(0))
 for i in range(8):
     eu_audio[f"PC{i+1}"] = eu_pcs[:, i]
 
-# ── 4. Load EU FinBERT tone ───────────────────────────────────────────────────
-print("Loading EU FinBERT tone...")
+#  4. Load EU FinBERT tone 
 eu_tone = pd.read_csv(base / "finbert" / "finbert_tone_eu.csv")
 eu_tone = eu_tone[~eu_tone["ticker"].isin(EXCLUDE_EU)][
     ["ticker", "quarter", "analyst_tone", "n_sentences"]
@@ -136,8 +125,7 @@ eu_tone = eu_tone[~eu_tone["ticker"].isin(EXCLUDE_EU)][
 print(f"  EU tone rows: {len(eu_tone)}  "
       f"non-missing: {eu_tone['analyst_tone'].notna().sum()}")
 
-# ── 5. EU financial controls (CRSP-based lnmve only) ─────────────────────────
-print("Fetching EU financial controls from CRSP...")
+#  5. EU financial controls (CRSP-based lnmve only) 
 eu_sample = pd.read_csv(base / "european_adr_sample.csv")
 eu_sample = eu_sample[~eu_sample["ticker"].isin(EXCLUDE_EU)]
 eu_permnos = eu_sample["permno"].tolist()
@@ -173,8 +161,7 @@ eu_ctrl = (qmve.merge(
     [["ticker", "quarter", "lnmve"]])
 print(f"  EU controls rows: {len(eu_ctrl)}")
 
-# ── 6. Assemble EU frame ──────────────────────────────────────────────────────
-print("Assembling EU frame...")
+#  6. Assemble EU frame 
 eu = eu_oi.merge(eu_audio,  on=["ticker", "quarter"], how="left")
 eu = eu.merge(eu_tone,  on=["ticker", "quarter"], how="left")
 eu = eu.merge(eu_ctrl,  on=["ticker", "quarter"], how="left")
@@ -186,7 +173,7 @@ eu["is_2023"] = (eu["year"] == 2023).astype(int)
 # Open-reaction window: is_market_hours always 1 for EU (09:30-10:30 ET)
 eu["is_market_hours"] = 1
 
-# Winsorise key variables at 1/99th percentile
+# Winsorise key vars at 1/99th percentile
 for col in ["oi_shift", "analyst_tone", "stress_index", "lnmve"]:
     if col in eu.columns and eu[col].notna().sum() > 10:
         lo, hi = eu[col].quantile([0.01, 0.99])
@@ -195,10 +182,7 @@ for col in ["oi_shift", "analyst_tone", "stress_index", "lnmve"]:
 eu["is_eu"] = 1
 print(f"  EU frame: {eu.shape[0]} rows x {eu.shape[1]} cols")
 
-# ── 7. Pool US + EU ───────────────────────────────────────────────────────────
-print("Pooling US + EU...")
-
-# Align columns: add missing cols as NaN in each frame
+#  7. Pool US + EU 
 all_cols = sorted(set(us.columns) | set(eu.columns))
 us_aligned = us.reindex(columns=all_cols)
 eu_aligned = eu.reindex(columns=all_cols)
@@ -220,7 +204,7 @@ reduced_ctrl = ["oi_shift", "analyst_tone", "lnmve",
 n_complete = global_df.dropna(subset=reduced_ctrl).shape[0]
 print(f"  Complete (reduced controls): {n_complete}")
 
-# ── 8. Save ───────────────────────────────────────────────────────────────────
+#  8. Save 
 global_df.to_parquet(base / "analysis_dataset_GLOBAL.parquet", index=False)
 print(f"Saved: analysis_dataset_GLOBAL.parquet "
       f"({global_df.shape[0]} x {global_df.shape[1]})")
