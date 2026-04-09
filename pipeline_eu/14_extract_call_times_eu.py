@@ -38,10 +38,6 @@ base      = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 raw_dir   = base / "transcripts" / "europe" / "raw"
 out_path  = base / "call_times_eu_extracted.csv"
 
-print("=" * 60)
-print("EXTRACTING EU CALL DATES FROM REFINITIV TRANSCRIPTS")
-print("=" * 60)
-
 if not raw_dir.exists():
     raise FileNotFoundError(f"EU raw transcripts not found: {raw_dir}")
 
@@ -170,7 +166,6 @@ for fpath in txt_files:
         call_dt_gmt   = call_gmt.strftime("%Y-%m-%d %H:%M:%S")
         call_dt_et    = call_et.strftime("%Y-%m-%d %H:%M:%S")
     else:
-        # Date known; time unknown. EU fixed window doesn't require exact time.
         call_time_gmt = None
         call_time_et  = None
         call_dt_gmt   = None
@@ -195,7 +190,7 @@ print(f"  Date only:       {sum(1 for r in results if not r['call_time_gmt'])}")
 print(f"Errors/skipped:  {len(errors)}")
 
 if not results:
-    print("ERROR: no EU call times extracted.")
+    print("ERROR")
     raise SystemExit(1)
 
 df = (pd.DataFrame(results)
