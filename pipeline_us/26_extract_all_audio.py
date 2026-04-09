@@ -1,12 +1,20 @@
-
 #!/usr/bin/env python3
-
 """
+26_extract_all_audio.py
+Extract 88-dimensional eGeMAPS v02 acoustic features from US earnings
+call MP3s using OpenSMILE. Functionals level produces one summary
+vector per call. Composite stress index constructed post-hoc in
+rebuild_master_v2.py as z-Jitter + z-Shimmer - z-HNR.
 
-26_extract_all_audio.py / 36_extract_audio_2023.py
+Input:  data/audio/processed/*.mp3
+Output: data/audio_features/audio_features_all308.csv
+        (307 calls × 90 cols: 88 features + ticker + quarter)
 
-Extract 88-dimensional eGeMAPS acoustic features from earnings call MP3s.
-
+# NOTE: Portions of this script were debugged with assistance
+# from Claude AI (Anthropic). Core statistical design and all
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis
+# Advisor: Daniel Rigobon
 """
 
 import opensmile
