@@ -21,8 +21,8 @@ Outputs:
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
-# empirical choices are the author's own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis (2024)
+# empirical choices are my  own.
+# Author: Olivia Yang, Princeton Senior Thesis 
 # Advisor: Daniel Rigobon
 """
 
@@ -91,10 +91,8 @@ def run_m3_subgroup(label, mask, formula=F_TONE):
           f"stress={stress_c:+.4f}(p={stress_p:.3f})")
     return rows
 
-# ── Section 5.4: Subgroup Analysis ────────────────────────────────────────────
-print("=" * 65)
+#  Section 5.4: Subgroup Analysis 
 print("SUBGROUP ANALYSIS (Table 5.3)")
-print("=" * 65)
 
 all_rows = []
 
@@ -184,13 +182,10 @@ else:
 
 results_df = pd.DataFrame(all_rows)
 results_df.to_csv(tabs / "subgroup_results.csv", index=False)
-print(f"\nSaved: subgroup_results.csv  ({len(results_df)} rows)")
 
-# ── Section 5.8: SVB Natural Experiment ───────────────────────────────────────
-print("\n" + "=" * 65)
+#  Section 5.8: SVB Natural Experiment 
 print("SVB NATURAL EXPERIMENT (Table 5.8)")
 print("SVB quarter = Q1 2023 (calls April-May 2023, after March 10 collapse)")
-print("=" * 65)
 
 # Stress features to compare
 stress_vars = {
@@ -236,6 +231,5 @@ for col, label in stress_vars.items():
 
 svb_df = pd.DataFrame(svb_rows)
 svb_df.to_csv(tabs / "svb_experiment.csv", index=False)
-print(f"\nSaved: svb_experiment.csv")
 print("\nNote: Composite stress index directionally elevated in SVB quarter")
 print("(p > 0.05 expected — small N single quarter; directional, not conclusive)")
