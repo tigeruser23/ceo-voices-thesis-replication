@@ -1,0 +1,16 @@
+permno,ticker,company_name,country,exchange_home,exchange_us,exchange_data,hexcd,hist_vol,vol_quintile,mean_price,mean_mktcap_b,taq_2022Q1,taq_2023Q1,taq_ok,qtrs_covered,n_firm_quarters,sample_type
+89475,SNY,Sanofi SA,France,Euronext,NASDAQ,NYSE_TAQ,3,0.07579,1,49.5,14219.6,14541,24654,True,8,8,european_adr
+89382,SAP,SAP SE,Germany,XETRA,NYSE,NYSE_TAQ,1,0.0922,1,117.68,7116.78,13286,16926,True,8,8,european_adr
+82637,E,Eni SpA,Italy,Borsa,NYSE,NYSE_TAQ,1,0.0938,1,28.82,1095.93,3751,5696,True,8,8,european_adr
+81472,ASML,ASML Holding,Netherlands,AEX,NASDAQ,NYSE_TAQ,3,0.13335,1,615.97,53432.02,35314,45678,True,8,8,european_adr
+88487,PHG,Philips,Netherlands,AEX,NYSE,NYSE_TAQ,1,0.11852,1,21.07,2038.67,14912,13154,True,8,8,european_adr
+75152,SAN,Banco Santander,Spain,BME,NYSE,NYSE_TAQ,1,0.09798,1,10.65,1637.75,12038,14900,True,8,8,european_adr
+75381,BBVA,BBVA,Spain,BME,NYSE,NYSE_TAQ,1,0.09804,1,6.55,894.26,6258,6080,True,8,8,european_adr
+33452,ERIC,Ericsson,Sweden,Nasdaq Stockholm,NASDAQ,NYSE_TAQ,3,0.11473,1,6.53,2094.95,21681,19226,True,8,8,european_adr
+88233,NVS,Novartis AG,Switzerland,SIX,NYSE,NYSE_TAQ,1,0.05782,1,91.48,24376.0,34999,35215,True,8,8,european_adr
+27888,CFR,Richemont,Switzerland,SIX,NYSE,NYSE_TAQ,1,0.08551,2,120.74,7749.13,11322,13496,True,8,8,european_adr
+79363,AZN,AstraZeneca,UK,LSE,NASDAQ,NYSE_TAQ,3,0.05697,1,65.94,39232.95,55404,80022,True,8,8,european_adr
+29890,BP,BP plc,UK,LSE,NYSE,NYSE_TAQ,1,0.08173,4,34.02,31369.26,60630,85956,True,8,8,european_adr
+90794,SHEL,Shell plc,UK,LSE,NYSE,NYSE_TAQ,1,0.06704,3,57.96,25785.95,43789,86545,True,8,8,european_adr
+89330,RIO,Rio Tinto,UK,LSE,NYSE,NYSE_TAQ,1,0.10372,5,41.1,13223.08,35519,58629,True,8,8,european_adr
+75064,GSK,GSK plc,UK,LSE,NYSE,NYSE_TAQ,1,0.06629,2,37.33,12689.54,27122,42389,True,8,8,european_adr
