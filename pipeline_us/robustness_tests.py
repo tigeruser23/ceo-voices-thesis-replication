@@ -23,8 +23,8 @@ Primary specification (M3):
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
-# empirical choices are the author's own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis (2024)
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton ORF 499 Senior Thesis
 # Advisor: Daniel Rigobon
 """
 
