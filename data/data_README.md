@@ -12,7 +12,7 @@ each pipeline stage.
 
 ## Root-level files
 
-These small metadata files ARE committed to the repo:
+These small metadata files are committed to the repo:
 
 ```
 data/
