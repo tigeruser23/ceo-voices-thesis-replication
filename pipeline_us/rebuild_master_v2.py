@@ -17,7 +17,7 @@ Output: data/analysis_dataset_MASTER.parquet  (310 x 156; ~282 complete)
 # Advisor: Daniel Rigobon
 """
 
-import os                                        # FIX: was missing, caused NameError
+import os                                      
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -26,7 +26,7 @@ from sklearn.preprocessing import StandardScaler
 
 base = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 
-# ── Order imbalance: merge three sources ──────────────────────────────────────
+# Order imbalance: merge three sources
 oi_q1q2 = pd.read_csv(base / "taq" / "synchronized_q1q2_2022.csv")
 oi_q3q4 = pd.read_csv(base / "synchronized" / "full_synchronized.csv")
 oi_2023 = pd.read_csv(base / "taq_2023_oi_patch.csv")
@@ -44,7 +44,7 @@ oi = (pd.concat([oi_q1q2, oi_q3q4, oi_2023], ignore_index=True)
 
 print(f"OI rows (deduplicated): {len(oi)}")
 
-# ── Audio features ────────────────────────────────────────────────────────────
+#  Audio features 
 audio      = pd.read_csv(base / "audio_features" / "audio_features_all308.csv")
 audio_cols = [c for c in audio.columns if c not in ["ticker", "quarter"]]
 
@@ -79,16 +79,16 @@ pcs = PCA(n_components=8, random_state=42).fit_transform(
 for i in range(8):
     audio[f"PC{i+1}"] = pcs[:, i]
 
-# ── FinBERT tone ──────────────────────────────────────────────────────────────
+#  FinBERT tone 
 tone = pd.read_csv(
     base / "finbert" / "finbert_tone_results_all.csv"
 )[["ticker", "quarter", "analyst_tone"]]
 
-# ── Financial controls ────────────────────────────────────────────────────────
+#  Financial controls 
 ctrl = pd.read_csv(base / "financial_controls_all.csv")
 ctrl["lnmve"] = np.log(ctrl["mve"].clip(lower=0.001))
 
-# ── Merge ─────────────────────────────────────────────────────────────────────
+#  Merge 
 df = oi.merge(audio, on=["ticker", "quarter"], how="left")
 df = df.merge(tone,  on=["ticker", "quarter"], how="left")
 df = df.merge(ctrl,  on=["ticker", "quarter"], how="left")
@@ -97,13 +97,13 @@ df["log_during_n_trades"] = np.log1p(df["during_n_trades"].fillna(0))
 df["year"]    = df["quarter"].str.extract(r"_(\d{4})").astype(float)
 df["is_2023"] = (df["year"] == 2023).astype(int)
 
-# ── Winsorise ─────────────────────────────────────────────────────────────────
+#  Winsorise 
 for col in ["oi_shift", "analyst_tone", "stress_index", "roa", "lnmve", "bm"]:
     if col in df.columns and df[col].notna().sum() > 10:
         lo, hi = df[col].quantile([0.01, 0.99])
         df[col] = df[col].clip(lo, hi)
 
-# ── Save ───────────────────────────────────────────────────────────────────────
+#  Save 
 df.to_parquet(base / "analysis_dataset_MASTER.parquet", index=False)
 
 complete = df.dropna(subset=["oi_shift", "analyst_tone",
