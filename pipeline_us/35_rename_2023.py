@@ -1,14 +1,27 @@
-
 #!/usr/bin/env python3
-
 """
-
 35_rename_2023.py
+Standardises Refinitiv StreetEvents audio and transcript filenames to
+the pipeline convention: TICKER_Qn_YYYY.{mp3,txt}
 
-Quarter determined by call date (calendar convention):
+Quarter assigned by calendar convention (not fiscal):
+  Q1: Jan–Mar | Q2: Apr–Jun | Q3: Jul–Sep | Q4: Oct–Dec
 
-  Q1: Jan-Mar | Q2: Apr-Jun | Q3: Jul-Sep | Q4: Oct-Dec
+Corrects previous bug where both Q3 and Q4 2023 calls were
+mapped into Q4_2023 slots due to a fiscal-vs-calendar offset error.
+Clears any existing 2023 processed files before re-renaming.
 
+Input:  data/audio/raw/*.mp3
+        data/transcripts/raw/*.txt
+        data/selected_sample_40_FINAL.csv
+Output: data/audio/processed/
+        data/transcripts/processed/
+
+# NOTE: Portions of this script were debugged with assistance
+# from Claude AI (Anthropic). Core statistical design and all
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis  
+# Advisor: Daniel Rigobon
 """
 
 
