@@ -87,7 +87,6 @@ r2_df = pd.DataFrame([
     {"model": "Controls + Both (M3)",    "r2": r2_both,   "incr_pp": round(incr_joint*100,4)},
 ])
 r2_df.to_csv(tabs / "incremental_r2.csv", index=False)
-print(f"\nSaved: incremental_r2.csv")
 
 #  Section 5.10: Economic Magnitude 
 print("ECONOMIC MAGNITUDE (Section 5.10)")
