@@ -24,7 +24,7 @@ Primary specification (M3):
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
 # empirical choices are my own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis
+# Author: Olivia Yang, Princeton Senior Thesis
 # Advisor: Daniel Rigobon
 """
 
@@ -43,7 +43,7 @@ warnings.filterwarnings("ignore")
 base = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 df   = pd.read_parquet(base / "analysis_dataset_MASTER.parquet")
 
-# ── Analysis sample ────────────────────────────────────────────────────────────
+#  Analysis sample 
 M3_FORMULA = ("oi_shift ~ stress_index + analyst_tone"
               " + roa + lnmve + bm"
               " + is_market_hours + log_during_n_trades + is_2023")
@@ -61,21 +61,14 @@ data = df[KEEP].dropna(
 
 data["qtr"] = data["quarter"].str.split("_").str[0]   # e.g. "Q1"
 
-print("=" * 65)
-print("ROBUSTNESS CHECKS — Primary specification: M3")
-print("=" * 65)
 print(f"Analysis sample: {len(data)} observations  "
       f"({data['ticker'].nunique()} firms)")
 
 def stars(p: float) -> str:
     return "***" if p < .01 else "**" if p < .05 else "*" if p < .10 else ""
 
-# ── Section 1: SE specifications ──────────────────────────────────────────────
-print("\n" + "─" * 65)
-print("Section 1: Analyst tone coefficient across SE specifications")
-print("─" * 65)
+#  Section 1: SE specifications 
 print(f"{'Specification':<25} {'coef':>8}  {'se':>7}  {'p':>7}  sig")
-print("-" * 55)
 
 SE_SPECS = [
     ("OLS",            M3_FORMULA, {}),
@@ -98,11 +91,7 @@ for spec_name, formula, fit_kw in SE_SPECS:
     except Exception as e:
         print(f"  {spec_name:<23} ERROR: {e}")
 
-# ── Section 2: Autocorrelation diagnostics ────────────────────────────────────
-print("\n" + "─" * 65)
-print("Section 2: Autocorrelation diagnostics (HC3 residuals)")
-print("─" * 65)
-
+#  Section 2: Autocorrelation diagnostics 
 m_hc3  = smf.ols(M3_FORMULA, data=data).fit(cov_type="HC3")
 resids = m_hc3.resid
 
@@ -118,11 +107,7 @@ bg4 = acorr_breusch_godfrey(m_hc3, nlags=4)
 print(f"  Breusch-Godfrey(lag=4): LM={bg4[0]:.3f}  p={bg4[1]:.4f}  "
       f"{'reject H0 (autocorr)' if bg4[1] < 0.05 else 'fail to reject'}")
 
-# ── Section 3: Heteroskedasticity ─────────────────────────────────────────────
-print("\n" + "─" * 65)
-print("Section 3: Heteroskedasticity (White test)")
-print("─" * 65)
-
+#  Section 3: Heteroskedasticity 
 try:
     ws, wp, _, _ = het_white(resids, m_hc3.model.exog)
     verdict = "→ HC3 justified" if wp < 0.05 else "→ homoskedastic"
@@ -130,11 +115,7 @@ try:
 except Exception as e:
     print(f"  White test failed: {e}")
 
-# ── Section 4: Within-firm AC(1) of analyst tone ──────────────────────────────
-print("\n" + "─" * 65)
-print("Section 4: Within-firm AC(1) of analyst tone")
-print("─" * 65)
-
+#  Section 4: Within-firm AC(1) of analyst tone 
 ac1_vals = (data.sort_values(["ticker", "quarter"])
                .groupby("ticker")["analyst_tone"]
                .apply(lambda x: x.autocorr(lag=1) if len(x) >= 3 else np.nan)
@@ -147,10 +128,7 @@ print(f"  Std AC(1):   {ac1_vals.std():.4f}")
 print(f"  (Negative mean AC(1) = analyst tone reverts within-firm; "
       f"not persistent)")
 
-# ── Summary ────────────────────────────────────────────────────────────────────
-print("\n" + "=" * 65)
-print("Summary")
-print("=" * 65)
+#  Summary 
 c_hc3 = m_hc3.params["analyst_tone"]
 p_hc3 = m_hc3.pvalues["analyst_tone"]
 print(f"  Primary HC3 result: β(analyst_tone) = {c_hc3:.4f}  "
