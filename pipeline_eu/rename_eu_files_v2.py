@@ -42,9 +42,7 @@ t_proc.mkdir(parents=True, exist_ok=True)
 sample = pd.read_csv(base / "european_adr_sample.csv")
 VALID_NYSE = set(sample["ticker"].tolist())
 
-# ── Refinitiv → NYSE ticker mapping ───────────────────────────────────────────
-# Audio files use short Refinitiv tickers (no exchange suffix).
-# Transcript files use TICKER.EXCHANGE format; suffix stripped before lookup.
+#  Refinitiv → NYSE ticker mapping 
 REFINITIV_TO_NYSE = {
     # Firms where Refinitiv ticker differs from NYSE ticker
     "ABBN"    : "ABB",
@@ -143,7 +141,7 @@ def parse_transcript(fname: str):
     ref_ticker = strip_exchange_suffix(m.group(4))
     return dt, ref_ticker
 
-# ── Main renaming loop ─────────────────────────────────────────────────────────
+#  Main renaming loop 
 # Track (output_path -> list of (source_path, file_size)) for dup resolution
 audio_candidates = {}   # dest_path -> [(src_path, size)]
 trans_candidates = {}
