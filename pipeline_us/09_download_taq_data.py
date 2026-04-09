@@ -1,16 +1,21 @@
-
 #!/usr/bin/env python3
-
 """
+09_download_taq_data.py
+Download NYSE TAQ millisecond trade and quote data for each US firm-quarter.
 
-09_download_taq_data.py / 15_download_taq_precise.py
+Six-hour window centered on call start time (UTC→ET corrected).
+Includes skip-existing guard for incremental runs.
 
-Download NYSE TAQ millisecond data for each firm-quarter.
+Input:  data/selected_sample_40_FINAL.csv
+        data/call_times_extracted.csv
+Output: data/taq/{TICKER}_{QUARTER}_taq.csv.gz
 
-Six-hour window centered on call start time (UTC -> ET corrected).
-
+# NOTE: Portions of this script were debugged with assistance
+# from Claude AI (Anthropic). Core statistical design and all
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis
+# Advisor: Daniel Rigobon
 """
-
 
 
 import wrds
