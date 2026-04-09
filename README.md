@@ -1,11 +1,11 @@
 # Replication Code: Do CEO Voices Move Markets?
 
-**Olivia Yang — Princeton ORF 499 Senior Thesis (2024)**  
+**Olivia Yang — Princeton Senior Thesis**  
 Advisor: Daniel Rigobon
 
 > **Note:** Portions of the pipeline code were debugged with assistance from
 > Claude AI (Anthropic). Core statistical design and all empirical choices
-> are the author's own.
+> are my own.
 
 ## Overview
 
