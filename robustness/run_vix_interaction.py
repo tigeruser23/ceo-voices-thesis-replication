@@ -20,11 +20,10 @@ Specifications:
        WITHOUT year dummy inside CTRL, to test whether continuous VIX
        and discrete year dummy are jointly significant or collinear)
 
-  NOTE: V4 differs from V3 by using CTRL_NO2023 + explicit is_2023
-  to directly pit the continuous and discrete measures against each other.
-  V3 uses CTRL (which already includes is_2023), so V3 and V4 are
-  NOT identical — V4 allows the year dummy coefficient to be read
-  separately from the VIX interaction coefficient.
+  NOTE: V4 differs from V3 by using CTRL_NO2023 + explicit is_2023.
+  V3 uses CTRL (which already includes is_2023). V4 lets the year 
+  dummy coefficient to be read separately from the VIX interaction 
+  coefficient.
 
 VIX DATA SOURCE:
   vix_daily.csv must be downloaded from FRED before running:
@@ -57,7 +56,7 @@ BASE = Path(f"/scratch/network/{os.environ['USER']}/thesis_week1/data")
 TABS = BASE / "tables_v2"
 TABS.mkdir(exist_ok=True)
 
-# ── Load data ─────────────────────────────────────────────────────────────────
+#  Load data 
 df  = pd.read_parquet(BASE / "analysis_dataset_MASTER.parquet")
 vix = pd.read_csv(BASE / "vix_daily.csv", parse_dates=["date"])
 vix["date"] = pd.to_datetime(vix["date"])
@@ -68,7 +67,7 @@ print(f"Master dataset:  {len(df)} rows")
 print(f"VIX data:        {len(vix)} trading days "
       f"({vix['date'].min().date()} – {vix['date'].max().date()})")
 
-# ── Merge VIX onto call dates ─────────────────────────────────────────────────
+#  Merge VIX onto call dates 
 def quarter_to_approx_date(quarter: str) -> pd.Timestamp:
     """Approximate call date as midpoint of earnings season."""
     qmap = {"Q1": "05-01", "Q2": "08-01", "Q3": "11-01", "Q4": "02-15"}
@@ -105,7 +104,7 @@ merged["vix_z"] = (merged["vix_call"] - vix_mean) / vix_std
 print(f"VIX stats:       mean={vix_mean:.1f}  SD={vix_std:.1f}  "
       f"min={merged['vix_call'].min():.1f}  max={merged['vix_call'].max():.1f}")
 
-# ── Control vectors ───────────────────────────────────────────────────────────
+#  Control vectors 
 CTRL        = "roa + lnmve + bm + is_market_hours + log_during_n_trades + is_2023"
 CTRL_NO2023 = "roa + lnmve + bm + is_market_hours + log_during_n_trades"
 
@@ -126,7 +125,7 @@ def run_ols(formula: str, data: pd.DataFrame, cov: str = "HC3"):
         print(f"  Model failed: {e}")
         return None, 0
 
-# ── Specifications ────────────────────────────────────────────────────────────
+#  Specifications 
 specs = {
     # V1: VIX main effect only (no interaction)
     "V1": (f"oi_shift ~ analyst_tone + vix_call + {CTRL}", merged),
@@ -141,9 +140,7 @@ specs = {
     "V4": (f"oi_shift ~ analyst_tone * vix_z + is_2023 + {CTRL_NO2023}", merged),
 }
 
-print("\n" + "=" * 65)
 print("VIX INTERACTION REGRESSIONS")
-print("=" * 65)
 
 results = {}
 for label, (formula, data) in specs.items():
@@ -182,7 +179,7 @@ for label, (formula, data) in specs.items():
             te    = tone_c + int_c * vz
             print(f"  Implied tone @ VIX={vraw:.0f} ({label_p} pctile): {te:+.4f}")
 
-# ── Save CSV ──────────────────────────────────────────────────────────────────
+#  Save CSV 
 rows = []
 for label, (m, n) in results.items():
     for var in m.params.index:
@@ -194,7 +191,7 @@ for label, (m, n) in results.items():
         })
 pd.DataFrame(rows).to_csv(TABS / "vix_interaction_results.csv", index=False)
 
-# ── LaTeX table ───────────────────────────────────────────────────────────────
+# LaTeX table 
 def fmt_coef(coef, se, p):
     s = stars(p)
     sup = f"^{{{s}}}" if s else ""
