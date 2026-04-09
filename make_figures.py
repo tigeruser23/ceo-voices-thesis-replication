@@ -3,7 +3,6 @@
 make_figures.py
 Generate all thesis figures (Figures 5.1-5.7).
 
-Requires prior completion of:
   run_regressions.py   → tables_v2/regression_results.csv
                           tables_v2/regime_results.csv
                           tables_v2/quarter_by_quarter.csv
@@ -23,8 +22,8 @@ Figures produced (saved to figures/):
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
-# empirical choices are the author's own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis (2024)
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis 
 # Advisor: Daniel Rigobon
 """
 
@@ -71,8 +70,7 @@ def stars(p):
 
 print(f"Analysis sample: {len(data)} observations")
 
-# ── Figure 5.1: M1-M5 coefficient plot ────────────────────────────────────────
-print("Generating Figure 5.1...")
+#  Figure 5.1: M1-M5 coefficient plot 
 
 specs = {
     "M1": f"oi_shift ~ {CTRL}",
@@ -126,10 +124,8 @@ ax.legend(framealpha=0.9)
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_1_coef_m1_m5.pdf")
 plt.close()
-print("  Saved: fig5_1_coef_m1_m5.pdf")
 
-# ── Figure 5.2: Regime split + quarter-by-quarter ────────────────────────────
-print("Generating Figure 5.2...")
+#  Figure 5.2: Regime split + quarter-by-quarter 
 
 f_base = ("oi_shift ~ analyst_tone"
           " + roa + lnmve + bm + is_market_hours + log_during_n_trades")
@@ -197,10 +193,8 @@ fig.suptitle("Figure 5.2: Analyst Tone Regime Split", y=1.02)
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_2_regime_split.pdf", bbox_inches="tight")
 plt.close()
-print("  Saved: fig5_2_regime_split.pdf")
 
-# ── Figure 5.3: OI shift distributions by year ───────────────────────────────
-print("Generating Figure 5.3...")
+#  Figure 5.3: OI shift distributions by year 
 oi_data = df[df["oi_shift"].notna()].copy()
 oi_22 = oi_data[oi_data["year"]==2022]["oi_shift"]
 oi_23 = oi_data[oi_data["year"]==2023]["oi_shift"]
@@ -219,10 +213,8 @@ ax.legend(framealpha=0.9)
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_3_oi_distributions.pdf")
 plt.close()
-print("  Saved: fig5_3_oi_distributions.pdf")
 
-# ── Figure 5.4: Incremental R² decomposition ─────────────────────────────────
-print("Generating Figure 5.4...")
+#  Figure 5.4: Incremental R² decomposition 
 r2_path = tabs / "incremental_r2.csv"
 if r2_path.exists():
     r2_df = pd.read_csv(r2_path)
@@ -251,10 +243,8 @@ for bar, val in zip(bars, r2_vals):
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_4_incremental_r2.pdf")
 plt.close()
-print("  Saved: fig5_4_incremental_r2.pdf")
 
-# ── Figures 5.5 and 5.6: Permutation and bootstrap ───────────────────────────
-print("Generating Figures 5.5 and 5.6 (permutation + bootstrap)...")
+#  Figures 5.5 and 5.6: Permutation and bootstrap 
 
 val_path = tabs / "validation_results.csv"
 if val_path.exists():
@@ -309,10 +299,8 @@ fig.suptitle("Figure 5.5: Permutation Test Null Distributions vs True Coefficien
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_5_permutation.pdf", bbox_inches="tight")
 plt.close()
-print("  Saved: fig5_5_permutation.pdf")
 
 # Figure 5.6: Bootstrap CIs
-print("  Running bootstrap (500 resamples for figure)...")
 np.random.seed(77)
 N_BOOT = 500
 boot_t, boot_s = [], []
@@ -349,10 +337,8 @@ fig.suptitle("Figure 5.6: Bias-Corrected Bootstrap Confidence Intervals", y=1.02
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_6_bootstrap_ci.pdf", bbox_inches="tight")
 plt.close()
-print("  Saved: fig5_6_bootstrap_ci.pdf")
 
-# ── Figure 5.7: SE specifications ─────────────────────────────────────────────
-print("Generating Figure 5.7...")
+#  Figure 5.7: SE specifications 
 
 se_specs = [
     ("OLS",           {"cov_type": "nonrobust"}),
@@ -418,9 +404,6 @@ for xi, (c, p) in enumerate(zip(se_coefs, se_ps)):
 plt.tight_layout()
 plt.savefig(fig_dir / "fig5_7_se_specs.pdf")
 plt.close()
-print("  Saved: fig5_7_se_specs.pdf")
-
-print(f"\nAll figures saved to: {fig_dir}")
 print("Files:")
 for f in sorted(fig_dir.glob("fig5_*.pdf")):
     print(f"  {f.name}")
