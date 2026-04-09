@@ -59,7 +59,7 @@ def run_ols(formula: str, data: pd.DataFrame, cov: str = "HC3"):
         print(f"  OLS error: {e}")
         return None, 0
 
-# ── G1-G5: pre-specified cross-market specifications ─────────────────────────
+#  G1-G5: pre-specified cross-market specifications 
 specs = {
     "G1": (f"oi_shift ~ analyst_tone + stress_index + {CTRL_FULL}",
            df[df["is_eu"] == 0]),
@@ -76,9 +76,7 @@ specs = {
            df),
 }
 
-print("=" * 70)
 print("Cross-market specifications G1-G5")
-print("=" * 70)
 
 results = []
 models  = {}   # store for Chow test in G6
@@ -114,11 +112,8 @@ for label, (formula, data) in specs.items():
           f"tone={tone_c:.4f}({stars(tone_p)})  "
           f"tone_x_eu={txeu_c:.4f}({stars(txeu_p)})")
 
-# ── G6: EU regime split (2022 vs 2023) ────────────────────────────────────────
-# FIX: G6 was missing entirely from prior version
-print("\n" + "=" * 70)
+#  G6: EU regime split (2022 vs 2023) 
 print("G6: EU regime split (2022 vs 2023)")
-print("=" * 70)
 
 eu_df    = df[df["is_eu"] == 1].copy()
 f_eu_base = (f"oi_shift ~ analyst_tone + stress_index + {CTRL_REDUCED}")
@@ -168,6 +163,6 @@ if all([m_eu_pool, m_eu_22, m_eu_23]):
         "n": n_e22 + n_e23, "r2": np.nan,
     })
 
-# ── Save ───────────────────────────────────────────────────────────────────────
+#  Save 
 pd.DataFrame(results).to_csv(tabs / "regression_results_global.csv", index=False)
 print(f"\nSaved: regression_results_global.csv  ({len(results)} rows)")
