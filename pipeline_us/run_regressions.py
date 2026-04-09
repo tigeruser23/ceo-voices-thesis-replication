@@ -39,7 +39,6 @@ def stars(p: float) -> str:
 
 def run_ols(formula: str, data: pd.DataFrame, cov: str = "HC3"):
     """Fit OLS with robust SEs; return (model, n) or (None, 0)."""
-    # Extract variable names from formula for dropna
     clean = (formula.replace("~", " ").replace("+", " ").replace("*", " ")
                     .replace("C(", "").replace(")", ""))
     vars_ = [v.strip() for v in clean.split()
@@ -55,7 +54,7 @@ def run_ols(formula: str, data: pd.DataFrame, cov: str = "HC3"):
         print(f"  OLS error: {e}")
         return None, 0
 
-# ── M1-M5 main specifications ─────────────────────────────────────────────────
+#  M1-M5 main specifications 
 specs = {
     "M1": f"oi_shift ~ {CTRL}",
     "M2": f"oi_shift ~ analyst_tone + {CTRL}",
@@ -65,10 +64,6 @@ specs = {
     "M5": (f"oi_shift ~ PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8"
            f" + analyst_tone + {CTRL}"),
 }
-
-print("=" * 65)
-print("Main specifications M1-M5")
-print("=" * 65)
 
 main_results = []
 for label, formula in specs.items():
@@ -97,15 +92,10 @@ for label, formula in specs.items():
           f"tone={tone_c:.4f}({stars(tone_p)})  "
           f"stress={stress_c:.4f}({stars(stress_p)})")
 
-# FIX: save M1-M5 results to CSV
 pd.DataFrame(main_results).to_csv(tabs / "regression_results.csv", index=False)
 print(f"\nSaved: regression_results.csv")
 
-# ── Regime split: 2022 vs 2023 ────────────────────────────────────────────────
-print("\n" + "=" * 65)
-print("Regime split: pooled / 2022 / 2023")
-print("=" * 65)
-
+#  Regime split: 2022 vs 2023 
 f_base = ("oi_shift ~ analyst_tone"
           " + roa + lnmve + bm + is_market_hours + log_during_n_trades")
 
@@ -167,14 +157,10 @@ if m_int:
         "r2": m_int.rsquared,
     })
 
-# FIX: save regime results to CSV
 pd.DataFrame(regime_results).to_csv(tabs / "regime_results.csv", index=False)
 print(f"Saved: regime_results.csv")
 
-# ── Quarter-by-quarter tone coefficients ──────────────────────────────────────
-print("\n" + "=" * 65)
-print("Quarter-by-quarter analyst tone coefficients")
-print("=" * 65)
+#  Quarter-by-quarter tone coefficients 
 
 qxq_results = []
 for qtr in sorted(df["quarter"].dropna().unique()):
@@ -191,10 +177,7 @@ for qtr in sorted(df["quarter"].dropna().unique()):
 pd.DataFrame(qxq_results).to_csv(tabs / "quarter_by_quarter.csv", index=False)
 print(f"Saved: quarter_by_quarter.csv")
 
-# ── Benjamini-Hochberg scan over 88 eGeMAPS features ─────────────────────────
-print("\n" + "=" * 65)
-print("BH scan over eGeMAPS features (q=0.05)")
-print("=" * 65)
+#  Benjamini-Hochberg scan over 88 eGeMAPS features 
 
 audio_cols = [c for c in df.columns if c.startswith("audio_")]
 bh_base    = ["oi_shift", "analyst_tone", "roa", "lnmve", "bm",
