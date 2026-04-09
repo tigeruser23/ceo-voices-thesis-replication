@@ -23,8 +23,8 @@ Output: tables_v2/economic_magnitude.csv
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
-# empirical choices are the author's own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis (2024)
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis 
 # Advisor: Daniel Rigobon
 """
 
@@ -55,10 +55,8 @@ data      = df[KEEP].dropna(subset=["oi_shift","analyst_tone","stress_index",
 def stars(p):
     return "***" if p < .01 else "**" if p < .05 else "*" if p < .10 else ""
 
-# ── Section 5.3: Incremental R² decomposition ─────────────────────────────────
-print("=" * 65)
+#  Section 5.3: Incremental R² decomposition 
 print("INCREMENTAL R² DECOMPOSITION (Figure 5.4)")
-print("=" * 65)
 
 m_ctrl  = smf.ols(f"oi_shift ~ {CTRL}",                          data=data).fit(cov_type="HC3")
 m_tone  = smf.ols(f"oi_shift ~ analyst_tone + {CTRL}",           data=data).fit(cov_type="HC3")
@@ -91,12 +89,10 @@ r2_df = pd.DataFrame([
 r2_df.to_csv(tabs / "incremental_r2.csv", index=False)
 print(f"\nSaved: incremental_r2.csv")
 
-# ── Section 5.10: Economic Magnitude ──────────────────────────────────────────
-print("\n" + "=" * 65)
+#  Section 5.10: Economic Magnitude 
 print("ECONOMIC MAGNITUDE (Section 5.10)")
-print("=" * 65)
 
-# Non-Q5 subsample coefficient (the one used in thesis Section 5.10)
+# Non-Q5 subsample coefficient
 non_q5 = data[~data["quintile"].isin(["Q5_Fragile"])].copy()
 m_nonq5 = smf.ols(f"oi_shift ~ analyst_tone + stress_index + {CTRL}",
                    data=non_q5).fit(cov_type="HC3")
@@ -120,7 +116,7 @@ print(f"  σ_OI (OI shift SD, full sample): {sigma_oi:.4f}")
 print(f"  Median trades during call:        {median_trades:.0f}")
 print(f"  Mean trades during call:          {mean_trades:.0f}")
 
-# Primary calculation (thesis Equation 5.3)
+# Primary calculation (Equation 5.3)
 delta_oi    = abs(beta_tone) * sigma_tone
 pct_of_sd   = delta_oi / sigma_oi * 100
 
@@ -128,7 +124,7 @@ print(f"\nPrimary calculation (1-SD increase in analyst tone):")
 print(f"  |∆OI| = |{beta_tone:.3f}| × {sigma_tone:.3f} = {delta_oi:.3f}")
 print(f"  = {pct_of_sd:.1f}% of one SD of OI shift")
 
-# Dollar translation (thesis Equations 5.4 and 5.5)
+# Dollar translation (Equations 5.4 and 5.5)
 N_trades = median_trades
 upper_order_size = 50_000   # institutional notional ($)
 lower_order_size =  5_000   # child order ($)
