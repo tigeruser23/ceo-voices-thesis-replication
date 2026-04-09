@@ -36,7 +36,7 @@ out_dir   = data_dir / "finbert"
 out_dir.mkdir(parents=True, exist_ok=True)
 out_path  = out_dir / "finbert_tone_eu.csv"
 
-# ── Model setup ───────────────────────────────────────────────────────────────
+# Model setup 
 MODEL_NAME = "ProsusAI/finbert"
 tokenizer  = BertTokenizer.from_pretrained(MODEL_NAME)
 model      = BertForSequenceClassification.from_pretrained(MODEL_NAME)
@@ -46,14 +46,14 @@ model.eval()
 # Confirmed from model config.json: id2label = {0: positive, 1: negative, 2: neutral}
 IDX_POS, IDX_NEG = 0, 1
 
-# ── Skip-existing guard ───────────────────────────────────────────────────────
+#  Skip-existing guard 
 existing_keys = set()
 if out_path.exists():
     existing = pd.read_csv(out_path)
     existing_keys = set(zip(existing["ticker"], existing["quarter"]))
     print(f"Found {len(existing_keys)} already-scored EU calls. Skipping.")
 
-# ── Analyst turn extraction (identical to US pipeline) ────────────────────────
+#  Analyst turn extraction (identical to US pipeline) 
 ANALYST_PATTERNS = [
     r'^(?:analyst|question|q)\s*:',
     r'^\s{0,4}[A-Z][a-z]+ [A-Z][a-z]+\s*[\-\u2013]\s*(?:analyst|research)',
@@ -107,7 +107,7 @@ def score_sentence(sentence: str) -> np.ndarray:
         probs  = softmax(logits, dim=1).squeeze().numpy()
     return probs  # [P(pos), P(neg), P(neutral)]
 
-# ── Main scoring loop ─────────────────────────────────────────────────────────
+#  Main scoring loop 
 results    = []
 txt_files  = sorted(trans_dir.glob("*.txt"))
 print(f"Found {len(txt_files)} EU transcript files.")
@@ -153,7 +153,7 @@ for path in txt_files:
     print(f"  OK  {ticker} {quarter}  "
           f"n_sents={len(sentences)}  tone={p_pos - p_neg:.4f}")
 
-# ── Save (append to existing if any) ─────────────────────────────────────────
+#  Save (append to existing if any) 
 new_df = pd.DataFrame(results)
 
 if out_path.exists() and len(results) > 0:
