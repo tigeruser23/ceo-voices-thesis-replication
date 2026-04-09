@@ -1,6 +1,6 @@
 # Replication Code: Do CEO Voices Move Markets?
 
-**Olivia Yang — Princeton Senior Thesis**  
+**Olivia Yang — Princeton Senior Thesis (2026)**  
 Advisor: Daniel Rigobon
 
 > **Note:** Portions of the pipeline code were debugged with assistance from
@@ -28,7 +28,7 @@ across 11 countries using the same TAQ infrastructure.
 - OpenSMILE with eGeMAPS v02 feature set
 - HuggingFace `transformers` (ProsusAI/finbert)
 - Packages: `wrds`, `pandas`, `numpy`, `scikit-learn`, `statsmodels`,
-  `scipy`, `torch`, `opensmile`, `pytz`
+  `scipy`, `torch`, `opensmile`, `pytz`, `matplotlib`
 
 See `requirements.txt` for full package list with version constraints.
 
@@ -49,10 +49,14 @@ See `requirements.txt` for full package list with version constraints.
 | 7 | `27_sync_all.py` | Lee-Ready OI computation with DST-correct ET timestamps | `full_synchronized.csv` |
 | 8 | `29_financial_controls.py` | Compustat/I/B/E/S financial controls per firm-quarter | `financial_controls_all.csv` |
 | 9 | `rebuild_master_v2.py` | US master dataset assembly (310 × 156) | `analysis_dataset_MASTER.parquet` |
-| 10 | `run_regressions.py` | M1–M5, regime split, Chow test, BH scan | `regression_results.csv`, `regime_results.csv`, `bh_scan_results.csv` |
-| 11 | `run_validation.py` | Placebo, permutation, bootstrap, wrong-quarter | `validation_results.csv` |
-| 12 | `robustness_tests.py` | SE specifications, autocorrelation diagnostics | stdout |
-| 13 | `run_vix_interaction.py` | Continuous VIX interaction robustness check | `vix_interaction_results.csv`, `vix_interaction_table.tex` |
+| 10 | `summary_statistics.py` | Table 3.4: Summary statistics (US, EU, pooled) | `summary_statistics.csv` |
+| 11 | `run_regressions.py` | M1–M5, regime split, Chow test, BH scan | `regression_results.csv`, `regime_results.csv`, `bh_scan_results.csv` |
+| 12 | `run_validation.py` | Placebo, permutation, bootstrap, wrong-quarter | `validation_results.csv` |
+| 13 | `robustness_tests.py` | SE specifications, autocorrelation diagnostics (Table 5.9) | stdout |
+| 14 | `subgroup_analysis.py` | Subgroup analysis (Table 5.3) + SVB experiment (Table 5.8) | `subgroup_results.csv`, `svb_experiment.csv` |
+| 15 | `economic_magnitude.py` | Incremental R² decomposition (Fig 5.4) + economic magnitude (§5.10) | `incremental_r2.csv`, `economic_magnitude.csv` |
+| 16 | `run_vix_interaction.py` | Continuous VIX interaction robustness (Table 5.10) | `vix_interaction_results.csv`, `vix_interaction_table.tex` |
+| 17 | `make_figures.py` | All thesis figures (Figs 5.1–5.7) | `figures/fig5_*.pdf` |
 
 ### European ADR Extension
 
@@ -66,7 +70,32 @@ See `requirements.txt` for full package list with version constraints.
 | 6 | `28_run_finbert_eu.py` | FinBERT analyst tone for EU (skip-existing guard) | `finbert/finbert_tone_eu.csv` |
 | 7 | `38_sync_eu_adr.py` | Lee-Ready OI with open-reaction window for EU ADRs | `synchronized/eu_adr_synchronized.csv` |
 | 8 | `rebuild_master_global_v2.py` | Global dataset assembly (US + EU) | `analysis_dataset_GLOBAL.parquet` |
-| 9 | `run_regressions_global.py` | G1–G6 cross-market specifications | `regression_results_global.csv` |
+| 9 | `run_regressions_global.py` | G1–G6 cross-market specifications (Tables 5.6–5.7) | `regression_results_global.csv` |
+
+---
+
+## Thesis Tables and Figures — Script Mapping
+
+| Thesis item | Script |
+|-------------|--------|
+| Table 3.4: Summary Statistics | `summary_statistics.py` |
+| Table 5.1: M1–M5 Main Results | `run_regressions.py` |
+| Table 5.2: Regime Split / Chow | `run_regressions.py` |
+| Table 5.3: Subgroup Analysis | `subgroup_analysis.py` |
+| Table 5.4: BH Scan Top-8 | `run_regressions.py` |
+| Table 5.5: Validation Tests | `run_validation.py` |
+| Table 5.6: Cross-Market G1–G6 | `run_regressions_global.py` |
+| Table 5.7: EU Regime Split | `run_regressions_global.py` |
+| Table 5.8: SVB Natural Experiment | `subgroup_analysis.py` |
+| Table 5.9: Autocorrelation Diagnostics | `robustness_tests.py` |
+| Table 5.10: VIX Interaction | `run_vix_interaction.py` |
+| Figure 5.1: M1–M5 Coefficient Plot | `make_figures.py` |
+| Figure 5.2: Regime Split + Quarterly | `make_figures.py` |
+| Figure 5.3: OI Distributions by Year | `make_figures.py` |
+| Figure 5.4: Incremental R² | `make_figures.py` + `economic_magnitude.py` |
+| Figure 5.5: Permutation Null Distributions | `make_figures.py` |
+| Figure 5.6: Bootstrap Confidence Intervals | `make_figures.py` |
+| Figure 5.7: SE Specifications | `make_figures.py` |
 
 ---
 
@@ -85,23 +114,22 @@ See `requirements.txt` for full package list with version constraints.
 ### Timezone Correction (2023 TAQ data)
 2023 TAQ timestamps were stored in UTC in the source data but were
 incorrectly applied as Eastern Time, shifting all event windows by +4 hours.
-**Fix:** `14_extract_call_times.py` uses pytz for DST-aware UTC→ET
-conversion and stores the result in `call_datetime_et`. `27_sync_all.py`
-reads this column directly, correctly handling both EDT (UTC−4, summer)
-and EST (UTC−5, winter). Pre-fix OI standard deviation ≈ 0.50;
-post-fix ≈ 0.07–0.10, consistent with theory.
+`14_extract_call_times.py` uses pytz for DST-aware UTC→ET conversion and
+stores the result in `call_datetime_et`. `27_sync_all.py` reads this column
+directly, correctly handling both EDT (UTC−4, summer) and EST (UTC−5, winter).
+Pre-fix OI standard deviation ≈ 0.50; post-fix ≈ 0.07–0.10.
 
 ### EU Open-Reaction Window
 All European ADR calls occur 07:00–09:00 ET (pre-market). NYSE TAQ
 is illiquid pre-open, so EU OI is measured using a fixed open-reaction
 window: pre-window 09:00–09:30 ET, event window 09:30–10:30 ET.
-The `is_eu` indicator in pooled regressions absorbs any level
-difference from this window choice.
+The `is_eu` indicator in pooled regressions absorbs any level difference
+from this window choice.
 
 ### Semi-Annual Reporter Exclusions
-CFR (Richemont) and RIO (Rio Tinto) are retained through data
-collection but excluded at the regression stage. DGE, REL, BATS,
-and ULVR are excluded during file renaming.
+CFR (Richemont) and RIO (Rio Tinto) are retained through data collection
+but excluded at the regression stage. DGE, REL, BATS, and ULVR are
+excluded during file renaming.
 
 ### Refinitiv → NYSE Ticker Mapping
 Key mappings used in `rename_eu_files_v2.py`:
@@ -109,9 +137,8 @@ ABBN→ABB, INGA→ING, NOKIA→NOK, TTEF→TTE, PHIA→PHG,
 STMPA→STM, HSBA→HSBC.
 
 ### VIX Data
-`run_vix_interaction.py` requires `data/vix_daily.csv`, which must
-be downloaded manually from FRED before running:
-Series VIXCLS — https://fred.stlouisfed.org/series/VIXCLS
+`run_vix_interaction.py` requires `data/vix_daily.csv`, downloaded manually
+from FRED: Series VIXCLS — https://fred.stlouisfed.org/series/VIXCLS
 Save with columns: `date`, `vix`.
 
 ---
