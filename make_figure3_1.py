@@ -3,7 +3,7 @@
 make_figure3_1.py
 Generate Figure 3.1: Sample construction and data integration pipeline.
 
-Replicates the flowchart from the thesis showing how CRSP, NYSE TAQ,
+Flowchart from the thesis showing how CRSP, NYSE TAQ,
 Refinitiv StreetEvents, and FinBERT/WRDS data sources are integrated
 into analysis_dataset_MASTER.parquet.
 
@@ -12,8 +12,8 @@ Output: figures/fig3_1_pipeline.pdf
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
-# empirical choices are the author's own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis (2024)
+# empirical choices are my own.
+# Author: Olivia Yang, Princeton Senior Thesis
 # Advisor: Daniel Rigobon
 """
 
@@ -38,7 +38,7 @@ ax.set_xlim(0, 10)
 ax.set_ylim(0, 10)
 ax.axis("off")
 
-# ── Color palette (matches thesis figure) ────────────────────────────────────
+#  Color palette 
 DARK_BLUE  = "#2166ac"   # CRSP, 310 firm-quarters, final dataset
 MED_BLUE   = "#4393c3"   # Stratified sample
 GREEN      = "#4dac26"   # Refinitiv / OpenSMILE
@@ -64,25 +64,25 @@ def arrow(ax, x1, y1, x2, y2):
                                 lw=1.5, mutation_scale=15),
                 zorder=2)
 
-# ── Row 1: CRSP Universe ──────────────────────────────────────────────────────
+#  Row 1: CRSP Universe 
 draw_box(ax, 5, 9.0, 3.2, 0.7,
          "CRSP Universe\n1,792 firms (2022–2023)", DARK_BLUE, fontsize=9)
 
-# ── Arrow down ───────────────────────────────────────────────────────────────
+#  Arrow down 
 arrow(ax, 5, 8.65, 5, 8.05)
 
-# ── Row 2: Stratified Sample ──────────────────────────────────────────────────
+#  Row 2: Stratified Sample 
 draw_box(ax, 5, 7.7, 3.8, 0.65,
          "Stratified Sample\n40 firms × 5 volatility quintiles", MED_BLUE, fontsize=9)
 
-# ── Arrow down ───────────────────────────────────────────────────────────────
+#  Arrow down 
 arrow(ax, 5, 7.37, 5, 6.77)
 
-# ── Row 3: 310 Firm-Quarters ──────────────────────────────────────────────────
+#  Row 3: 310 Firm-Quarters 
 draw_box(ax, 5, 6.45, 4.0, 0.65,
          "310 Firm-Quarters\n(8 quarters × 40 firms, 3 missing audio)", DARK_BLUE, fontsize=9)
 
-# ── Three branches down from 310 firm-quarters ───────────────────────────────
+#  Three branches down from 310 firm-quarters 
 # Left branch → TAQ
 arrow(ax, 3.0, 6.12, 2.0, 5.32)
 # Center branch → Refinitiv
@@ -90,7 +90,7 @@ arrow(ax, 5.0, 6.12, 5.0, 5.32)
 # Right branch → FinBERT
 arrow(ax, 7.0, 6.12, 8.1, 5.32)
 
-# ── Row 4: Three data source boxes ────────────────────────────────────────────
+#  Row 4: Three data source boxes 
 # Left: NYSE TAQ
 draw_box(ax, 2.0, 4.9, 2.8, 0.75,
          "NYSE TAQ\nMillisecond trades\n(Lee-Ready signed)", TEAL, fontsize=8)
@@ -104,7 +104,7 @@ draw_box(ax, 8.1, 4.9, 2.6, 0.75,
          "FinBERT NLP\nAnalyst Q&A tone\n(3-class sentiment)", ORANGE,
          text_color="#333333", fontsize=8)
 
-# ── OI Shift label on left side ───────────────────────────────────────────────
+#  OI Shift label on left side 
 ax.text(0.3, 4.9, "OI Shift\n(ΔBuying\npressure)",
         ha="center", va="center", fontsize=7.5, color=GRAY,
         style="italic", multialignment="center")
@@ -112,25 +112,25 @@ ax.annotate("", xy=(1.2, 4.9), xytext=(0.7, 4.9),
             arrowprops=dict(arrowstyle="-|>", color=GRAY, lw=1.2, mutation_scale=10),
             zorder=2)
 
-# ── Arrows from three boxes down to controls label ────────────────────────────
+#  Arrows from three boxes down to controls label 
 arrow(ax, 2.0, 4.52, 3.5, 3.82)
 arrow(ax, 5.0, 4.52, 5.0, 3.82)
 arrow(ax, 8.1, 4.52, 6.5, 3.82)
 
-# ── Controls label ────────────────────────────────────────────────────────────
+#  Controls label 
 ax.text(5.0, 3.65, "+ WRDS Compustat / CRSP / I/B/E/S controls",
         ha="center", va="center", fontsize=8.5, color=GRAY,
         style="italic")
 
-# ── Arrow down to final dataset ───────────────────────────────────────────────
+#  Arrow down to final dataset 
 arrow(ax, 5, 3.45, 5, 2.85)
 
-# ── Final dataset box ─────────────────────────────────────────────────────────
+#  Final dataset box 
 draw_box(ax, 5, 2.45, 5.5, 0.75,
          "analysis_dataset_MASTER.parquet\n310 obs × 156 variables  |  281 complete cases",
          DARK_BLUE, fontsize=9)
 
-# ── Figure caption ────────────────────────────────────────────────────────────
+#  Figure caption 
 ax.text(5, 1.7,
         "Figure 3.1: Sample construction and data integration pipeline.",
         ha="center", va="center", fontsize=10, color="#333333",
