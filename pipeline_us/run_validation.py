@@ -8,9 +8,6 @@ Four pre-specified validation tests.
 3. Bias-corrected bootstrap confidence intervals (5,000 resamples)
 4. Wrong-quarter shuffle within firm (1,000 shuffles)
 
-FIX: ticker column is now included in key_vars from the start,
-     avoiding the index-alignment bug introduced by reset_index(drop=True).
-
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
 # empirical choices are my own.
@@ -36,9 +33,6 @@ CTRL   = "roa + lnmve + bm + is_market_hours + log_during_n_trades + is_2023"
 N_PERM = 10_000
 N_BOOT = 5_000
 
-# FIX: include 'ticker' in key_vars from the start to avoid index
-# misalignment in the wrong-quarter shuffle (prior version used
-# reset_index(drop=True) then tried to re-attach ticker by index).
 key_vars = (["oi_shift", "analyst_tone", "stress_index",
               "pre_30m_order_imbalance", "ticker"]
             + CTRL.split(" + "))
@@ -58,10 +52,7 @@ def ols_coef(data: pd.DataFrame, formula: str, var: str) -> float:
     except Exception:
         return np.nan
 
-# ── Test 1: Placebo dependent variable ────────────────────────────────────────
-print("\n" + "=" * 60)
-print("Test 1: Placebo DV (pre_30m_order_imbalance as DV)")
-print("=" * 60)
+#  Test 1: Placebo dependent variable 
 
 placebo_results = []
 for var in ["analyst_tone", "stress_index"]:
@@ -77,10 +68,7 @@ for var in ["analyst_tone", "stress_index"]:
         "coef": c, "p": p, "outcome": outcome,
     })
 
-# ── Test 2: Permutation test ───────────────────────────────────────────────────
-print("\n" + "=" * 60)
-print(f"Test 2: Permutation test ({N_PERM:,} shuffles)")
-print("=" * 60)
+#  Test 2: Permutation test 
 
 obs_tone   = ols_coef(perm_df,
                       f"oi_shift ~ analyst_tone + {CTRL}",
@@ -109,10 +97,7 @@ perm_p_tone   = np.mean(np.array(perm_t) <= obs_tone)
 perm_p_stress = np.mean(np.abs(perm_s) >= np.abs(obs_stress))
 print(f"  Permutation p  tone={perm_p_tone:.4f}  stress={perm_p_stress:.4f}")
 
-# ── Test 3: Bias-corrected bootstrap CIs ─────────────────────────────────────
-print("\n" + "=" * 60)
-print(f"Test 3: Bias-corrected bootstrap ({N_BOOT:,} resamples)")
-print("=" * 60)
+#  Test 3: Bias-corrected bootstrap CIs 
 
 np.random.seed(77)
 boot_t, boot_s = [], []
@@ -141,12 +126,7 @@ for var, coefs, obs in [("analyst_tone", boot_t, obs_tone),
         "ci_lo": ci[0], "ci_hi": ci[1],
     })
 
-# ── Test 4: Wrong-quarter shuffle within firm ─────────────────────────────────
-print("\n" + "=" * 60)
-print("Test 4: Wrong-quarter shuffle within firm (1,000 shuffles)")
-print("=" * 60)
-
-# FIX: ticker is already in perm_df, no index re-attachment needed
+#  Test 4: Wrong-quarter shuffle within firm 
 np.random.seed(42)
 wq_t, wq_s = [], []
 for i in range(1_000):
@@ -170,7 +150,7 @@ wq_p_tone   = np.mean(np.array(wq_t) <= obs_tone)
 wq_p_stress = np.mean(np.abs(wq_s) >= np.abs(obs_stress))
 print(f"  Wrong-quarter p  tone={wq_p_tone:.4f}  stress={wq_p_stress:.4f}")
 
-# ── Save all validation results ────────────────────────────────────────────────
+#  Save all validation results 
 val_summary = []
 val_summary.extend(placebo_results)
 val_summary.extend(boot_results)
