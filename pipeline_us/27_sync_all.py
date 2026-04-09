@@ -3,22 +3,22 @@
 27_sync_all.py
 Lee-Ready signed order imbalance with DST-correct ET timestamps.
 
-TIMEZONE BUG HISTORY:
+TIMEZONE BUG:
   2023 call timestamps were stored in UTC in source data but applied
   as ET, shifting all event windows +4h. Fix: 14_extract_call_times.py
   now uses pytz for DST-aware UTC→ET conversion and stores the result
   in call_datetime_et. This script reads call_datetime_et directly,
-  avoiding the hardcoded -4h offset that was incorrect for winter
+  avoiding the hardcoded offset that was incorrect for winter
   calls (Q4/Q1, when offset should be -5h for EST not -4h for EDT).
 
-  Pre-fix OI std ~0.50; post-fix ~0.07-0.10, consistent with theory.
+  Pre-fix OI std ~0.50; post-fix ~0.07-0.10, consistent.
 
 Output: data/synchronized/full_synchronized.csv
 
 # NOTE: Portions of this script were debugged with assistance
 # from Claude AI (Anthropic). Core statistical design and all
 # empirical choices are my own.
-# Author: Olivia Yang, Princeton ORF 499 Senior Thesis
+# Author: Olivia Yang, Princeton Senior Thesis
 # Advisor: Daniel Rigobon
 """
 
@@ -85,9 +85,7 @@ for _, row in calls.iterrows():
     ticker  = row['ticker']
     quarter = row['quarter']
 
-    # FIX: use call_datetime_et directly (DST-aware, set by 14_extract_call_times.py)
-    # Prior version reconstructed from call_time_gmt - 4h, which was wrong
-    # for winter calls (EST = UTC-5, not UTC-4).
+    # Use call_datetime_et directly (DST-aware, set by 14_extract_call_times.py)
     if pd.notna(row.get('call_datetime_et')):
         call_dt = pd.Timestamp(row['call_datetime_et'])
     else:
