@@ -29,13 +29,13 @@ out_dir.mkdir(parents=True, exist_ok=True)
 
 consolidated_path = out_dir / "eu_audio_features_all.csv"
 
-# ── OpenSMILE configuration ────────────────────────────────────────────────────
+#  OpenSMILE configuration 
 smile = opensmile.Smile(
     feature_set=opensmile.FeatureSet.eGeMAPSv02,
     feature_level=opensmile.FeatureLevel.Functionals,
 )
 
-# ── Load already-extracted files to support skip-existing ─────────────────────
+#  Load already-extracted files for skip-existing 
 existing_keys = set()
 if consolidated_path.exists():
     existing = pd.read_csv(consolidated_path)
@@ -44,7 +44,7 @@ if consolidated_path.exists():
     )
     print(f"Found {len(existing_keys)} already-extracted EU calls. Skipping.")
 
-# ── Extract ───────────────────────────────────────────────────────────────────
+#  Extract 
 results, errors = [], []
 
 mp3_files = sorted(audio_dir.glob("*.mp3"))
@@ -73,7 +73,7 @@ for mp3_path in mp3_files:
         errors.append({"file": stem, "error": str(e)})
         print(f"  ERR {stem}: {e}")
 
-# ── Consolidate with any previously extracted results ─────────────────────────
+#  Consolidate with any previously extracted results 
 new_df = pd.DataFrame(results)
 
 if consolidated_path.exists() and len(results) > 0:
@@ -87,8 +87,8 @@ else:
 
 combined.to_csv(consolidated_path, index=False)
 
-# ── Summary ────────────────────────────────────────────────────────────────────
-n_features = combined.shape[1] - 2  # subtract ticker, quarter
+#  Summary 
+n_features = combined.shape[1] - 2 
 print(f"\nExtracted: {len(results)} new calls")
 print(f"Total EU calls in file: {len(combined)}")
 print(f"eGeMAPS features: {n_features}")
