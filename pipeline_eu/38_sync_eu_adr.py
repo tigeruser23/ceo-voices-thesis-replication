@@ -19,8 +19,6 @@ COLUMN CORRECTION:
   script stores this as 'asksiz' for clarity. This script
   handles both column names.
 
-Clean rewrite (v2): no iterative patches from prior runs.
-
 Output: data/synchronized/eu_adr_synchronized.csv
 
 # NOTE: Portions of this script were debugged with assistance
